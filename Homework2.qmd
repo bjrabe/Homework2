@@ -1,0 +1,132 @@
+---
+title: "Data Structures in R"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Task 1: Basic Vector practice
+
+First we create two vectors, one corresponding to the pre-treatment measurements and one corresponding to the post-treatment measurements. These are denoted `pre` and `post`, respectively.  
+
+```{r}
+pre <- c( 120, 151, 125, 126, 115, 132, 132, 129, 134, 139, 127, 122, 127, 135, 133, 128, 147, 138, 140, 132)
+post <- c(127, 145, 135, 122, 115, 122, 123, 126, 126, 129, 132, 146, 120, 114, 121, 120, 128, 120, 133, 115)
+```
+
+Then we print both vectors.
+
+```{r}
+print(pre)
+print(post)
+```
+
+Next, we assign names to the vector elements for both `pre` and `post`. 
+
+```{r}
+names(pre) <- paste("Subject", 1:20, sep = "_")
+names(post) <- paste("Subject", 1:20, sep = "_")
+```
+
+Then we print the vectors again.
+
+```{r}
+print(pre)
+print(post)
+```
+
+Next, we calculate the change in blood pressure for each patient by subtracting post-treatment measurements from pre-treatment measurements. We save this difference vector in an object called `diff`. We print the vector. 
+
+```{r}
+diff <- pre - post
+print(diff)
+```
+
+To calculate the average difference in blood pressure, we take the mean of the difference vector.
+
+```{r}
+mean(diff)
+```
+
+We see the average decrease in blood pressure is 5.65 units.
+
+We next evaluate which subjects experienced a decrease in blood pressure after treatment.
+
+```{r}
+which(diff > 0)
+```
+
+The output lists those subjects who experienced a decrease in blood pressure after treatment.
+
+Finally, we will subset the vector of differences to create a vector which only includes subjects whose blood pressure decreased after treatment. We will save this vector in an object called `diff_sub`. Then we calculate the average decrease in blood pressure for only this subset of subjects.
+
+```{r}
+diff_sub <- diff[diff > 0]
+mean(diff_sub)
+```
+
+We see from the output that when only considering those subjects whose blood pressure decreased after treatment, the average decrease in blood pressure was 10.6 units.
+
+## Task 2: Basic Data Frame practice
+
+First, we create a data frame with four columns: `patient`, `pre_bp`, `post_bp`, and `diff_bp`. We save this data frame in an object called `df`.
+
+```{r}
+df <- data.frame(patient = 1:20, pre_bp = pre, post_bp = post, diff_bp = diff)
+df
+```
+
+Next we subset the data frame to return only those rows corresponding to subjects whose blood pressures **increased** after treatment (that is, the calculated difference is negative). We save this new data frame in an object called `df_sub`.
+
+```{r}
+df_sub <- df[df$diff_bp < 0,]
+df_sub
+```
+
+Next we add a new column to the original data frame which has value `TRUE` if the post-treatment blood pressure is less than 120 and `FALSE` otherwise. We name this column `at_goal` since a normal systolic blood pressure is less than 120 mmHg. In this code chunk we also print the data frame.
+
+```{r}
+df$at_goal <- df$post_bp < 120
+knitr::kable(df, align = c('l'))
+```
+
+## Task 3: List practice
+
+We start by creating a new data frame using the new data. We use the same sequence of steps as used in tasks 1 and 2. We first save the pre and post data as vectors, assign names, and then create the data frame. Then we use the post-treatment column in the data frame to create the new TRUE/FALSE column. We use the same column names that we used in task 2. We save the data frame in an object called `df_placebo`.
+
+```{r}
+pre_placebo <- c(138, 135, 147, 117, 152, 134, 114, 121, 131, 130)
+post_placebo <- c( 105, 136, 123, 130, 134, 143, 135, 139, 120, 124)
+names(pre_placebo) <- paste("Subject", 1:10, sep = "_")
+names(post_placebo) <- paste("Subject", 1:10, sep = "_")
+df_placebo <- data.frame(patient = 1:10, pre_bp = pre_placebo, post_bp = post_placebo, diff_bp = pre_placebo - post_placebo)
+df_placebo$at_goal <- df_placebo$post_bp < 120
+df_placebo
+```
+
+Next we create a list with two elements, the first of which is the data frame containing the treatment data and the second of which is the data frame containing the placebo data. We store the list in an object called `my_list`.
+
+```{r}
+my_list <- list(treatment = df, placebo = df_placebo)
+my_list
+```
+
+Next we access the first list element using three different types of syntax. The first two types return a data frame and the third type returns a list of length 1 (whose singleton element is a data frame).
+
+```{r}
+###syntax 1
+my_list$treatment
+
+###syntax 2
+my_list[[1]]
+
+###syntax 3
+my_list[1]
+```
+
+Finally, we use one line of code to access the `pre_bp` column of the placebo data frame. The column is returned as a vector.
+
+```{r}
+(my_list$placebo)$pre_bp
+```
